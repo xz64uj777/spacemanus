@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "groups": {
+    "flight-hardware": {
+      "name": "Flight Hardware",
+      "order": 10
+    },
+    "game-identity": {
+      "name": "Game Identity",
+      "order": 20
+    }
+  },
+  "bundles": {},
+  "assets": {
+    "assets/models/crew_shuttle.glb": {
+      "path": "/manus-storage/game/sha256/14c0f14c7693d004a662369ea70d1348c174f26fdb64c42e13c49ceabbbf99c8.glb",
+      "sha256": "sha256:14c0f14c7693d004a662369ea70d1348c174f26fdb64c42e13c49ceabbbf99c8",
+      "size": 1605228,
+      "assetType": "model",
+      "groupId": "flight-hardware"
+    },
+    "assets/models/eva_astronaut.glb": {
+      "path": "/manus-storage/game/sha256/b91b2a01a934e923cdc89c526a9424f60ac5a6a92775c04a15ede62a54ecb9e8.glb",
+      "sha256": "sha256:b91b2a01a934e923cdc89c526a9424f60ac5a6a92775c04a15ede62a54ecb9e8",
+      "size": 1134768,
+      "assetType": "model",
+      "groupId": "flight-hardware"
+    },
+    "assets/share/favicon.png": {
+      "path": "/manus-storage/game/sha256/302cb175090b2f4a2b6cf096eacea412e0c1e610719e2ec8b5481ea7e7a2ecb4.png",
+      "sha256": "sha256:302cb175090b2f4a2b6cf096eacea412e0c1e610719e2ec8b5481ea7e7a2ecb4",
+      "size": 19822,
+      "assetType": "image",
+      "groupId": "game-identity"
+    }
+  }
+}

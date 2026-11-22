@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 2,
+  "title": "Orbital: Flight & EVA",
+  "description": "Pilot a crewed spacecraft, dock at an orbital relay, complete a tethered spacewalk, then rendezvous with a lunar polar outpost.",
+  "defaultCaptions": {
+    "x": "Orbital: Flight & EVA — fly the relay mission, step outside for a repair, then make the long lunar approach.",
+    "facebook": "A crewed spaceflight game with precision docking, a tethered EVA repair, and a lunar rendezvous.",
+    "reddit": "Orbital: Flight & EVA — a short mission campaign built around piloting, docking and a spacewalk.",
+    "discord": "Orbital: Flight & EVA — near-orbit service mission and a long-range lunar rendezvous."
+  },
+  "assets": {
+    "favicon": "assets/share/favicon.png"
+  }
+}
