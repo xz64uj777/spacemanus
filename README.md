@@ -51,3 +51,8 @@ The main simulation changes in fixed steps. Pure mission rules stay in `src/game
 ## Credits and licensing
 
 The Orbital shuttle and EVA suit are registered GLB models; the orbital relay and lunar habitat are assembled from Three.js geometry. The game's custom 256 px favicon is registered in the `game-identity` asset group. The project uses Three.js (MIT), the inherited Rapier engine dependency (Apache-2.0), and bundled Manus CC0 fonts; font licensing is in `public/fonts/ManusCC0-LICENSE.txt`.
+
+
+## GitHub Pages
+
+The `main` branch deploys with GitHub Actions. After the deployment workflow succeeds, play at <https://xz64uj777.github.io/spacemanus/>. The Pages workflow uses `pnpm github:build` and the bundled shuttle, astronaut, and favicon files; normal Manus Preview asset paths remain unchanged.
