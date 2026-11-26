@@ -3,6 +3,7 @@ import type { Audio } from '../engine/audio'
 import type { Input } from '../engine/input'
 import type { Renderer } from '../engine/renderer'
 import { CONFIG } from './config'
+import { BASE_FLIGHT_FOV, flightVerticalFov } from './flight-camera'
 import { canServiceRelay, dockingReadiness, MISSION_DEFINITIONS, scaledMissionRange, type MissionId, type MissionStage } from './missions'
 import type { ModelSet } from './model-loading'
 import { createFallbackAstronaut, createFallbackShuttle } from './model-fallbacks'
@@ -31,7 +32,7 @@ const tempAccel = new THREE.Vector3()
 export class Game {
   mode: GameMode = 'title'
   readonly scene = new THREE.Scene()
-  readonly camera = new THREE.PerspectiveCamera(58, 1, 0.1, 4000)
+  readonly camera = new THREE.PerspectiveCamera(BASE_FLIGHT_FOV, 1, 0.1, 4000)
   readonly shipRoot = new THREE.Group()
   readonly velocity = new THREE.Vector3()
   readonly targetPosition = new THREE.Vector3()
@@ -213,6 +214,7 @@ export class Game {
   render(_alpha: number, frameSeconds: number): void {
     const dt = Math.min(0.05, Math.max(0, frameSeconds))
     this.time += dt
+    this.applyFlightFov()
     this.earth.rotation.y += dt * 0.0016
     this.starField.rotation.y = Math.sin(this.time * 0.015) * 0.02
     this.engineGlow.visible = this.mode === 'playing' && this.stage === 'approach' && this.engineGlow.scale.x > 0.08
@@ -255,6 +257,15 @@ export class Game {
       canDock: dock.ready, dockDistance, oxygen: Math.max(0, this.oxygen / CONFIG.eva.oxygenSeconds * 100),
       tether: this.avatarRoot.position.distanceTo(this.tetherAnchor), tetherLimit: CONFIG.eva.tetherLength,
       serviceDistance, canService: canServiceRelay(serviceDistance, CONFIG.eva.repairRadius), statusKey,
+    }
+  }
+
+  /** Tall screens would otherwise get a keyhole: widen the vertical FOV while the aspect is portrait. */
+  private applyFlightFov(): void {
+    const fov = flightVerticalFov(this.camera.aspect)
+    if (Math.abs(this.camera.fov - fov) > 1e-3) {
+      this.camera.fov = fov
+      this.camera.updateProjectionMatrix()
     }
   }
 
