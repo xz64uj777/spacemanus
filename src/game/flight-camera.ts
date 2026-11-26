@@ -12,7 +12,7 @@
 /** Vertical FOV used whenever the viewport is at least as wide as it is tall. */
 export const BASE_FLIGHT_FOV = 58
 
-/** Ceiling for the portrait widening; about 38 degrees horizontal on a 9:19.5 phone. */
+/** Ceiling for the portrait widening; about 44 degrees horizontal on a 9:19.5 phone. */
 export const MAX_FLIGHT_FOV = 82
 
 /** Vertical FOV for the flight chase camera at the given viewport aspect (width / height). */
