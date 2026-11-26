@@ -125,7 +125,7 @@
   "help.boostBrake": "Boost / brake",
   "help.interact": "Dock / EVA / repair",
   "help.pause": "Pause",
-  "help.touch": "To start: tap LAUNCH MISSION on Relay Seven. LEFT STICK: thrust and RCS strafe. DRAG RIGHT SIDE: steer. RISE / FALL: vertical movement. BOOST / BRAKE: speed. Tap the action prompt to dock, start the spacewalk or repair. Tap pause to hold.",
+  "help.touch": "To start: tap LAUNCH MISSION on Relay Seven. LEFT STICK: thrust and RCS strafe. DRAG RIGHT SIDE: steer. RISE / FALL: tap to hold vertical thrust, tap again to stop. BOOST / BRAKE: tap to latch on, tap again to release. Tap the action prompt to dock, start the spacewalk or repair. Tap pause to hold.",
   "help.gamepad": "Gamepad: left stick translate · right stick attitude · A rise · B fall · Y interact · LT brake · LB boost · Start pause",
   "help.note": "Bring relative speed below 7 m/s before docking. On EVA, stay inside your tether and reach the beacon before oxygen runs low.",
   "flight.header": "ORBITAL / FLIGHT OPERATIONS",

@@ -244,12 +244,14 @@ try {
   if (touchMotion.look.x < 0.05 || touchMotion.look.y < 0.05) throw new Error(`right-side touch drag did not steer: ${JSON.stringify(touchMotion.look)}`)
   for (const action of ['jump', 'descend', 'sprint', 'brake']) {
     const button = phonePage.locator(`[data-touch="${action}"]`)
-    await button.hover()
-    await phonePage.mouse.down()
-    const held = await phonePage.evaluate(action => { window.__game.input.update(); return window.__game.input.held(action) }, action)
-    await phonePage.mouse.up()
+    await button.tap()
+    const engaged = await phonePage.evaluate(action => {
+      window.__game.input.update()
+      return { held: window.__game.input.held(action), pressed: document.querySelector(`[data-touch="${action}"]`).getAttribute('aria-pressed') }
+    }, action)
+    await button.tap()
     const released = await phonePage.evaluate(action => { window.__game.input.update(); return window.__game.input.held(action) }, action)
-    if (!held || released) throw new Error(`mobile ${action} hold did not press and release its game action`)
+    if (!engaged.held || engaged.pressed !== 'true' || released) throw new Error(`mobile ${action} latch did not toggle on and off: ${JSON.stringify({ engaged, released })}`)
   }
   if (!(await phonePage.locator('.touch-hint').isVisible())) throw new Error('mobile flight-control hint is not visible')
   const hintOverlapsButtons = await phonePage.locator('.touch-hint').evaluate(element => {

@@ -180,6 +180,8 @@ body.has-touch .help-touch { display: block; }
 .touch-boost { right: 0; bottom: 28px; width: 62px; height: 62px; border-color: rgba(232,182,107,.7); color: #f2d6ad; }
 .touch-brake { right: 68px; bottom: 12px; width: 54px; height: 54px; }
 .touch-btn.is-down { transform: scale(.93); background: rgba(65,150,157,.5); }
+.touch-btn.is-on { background: rgba(65,150,157,.78); border-color: rgba(198,241,240,.95); color: #f2fffc; box-shadow: 0 0 0 1px rgba(123,226,225,.4), 0 0 14px rgba(123,226,225,.32); }
+.touch-boost.is-on { background: rgba(120,86,40,.78); border-color: rgba(242,214,173,.95); color: #fff3dc; box-shadow: 0 0 0 1px rgba(232,182,107,.45), 0 0 14px rgba(232,182,107,.34); }
 .touch-hint { display: none; }
 /* Touch HUD: one layout for portrait phones, landscape phones and tablets. */
 body.has-touch .touch-stick { left: calc(28px + env(safe-area-inset-left, 0px)); top: auto; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); margin: 0; opacity: .58; }
