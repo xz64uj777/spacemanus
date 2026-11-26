@@ -3,6 +3,53 @@ import type { Action, Input } from '../engine/input'
 /** Inside this radius the stick reports no thrust, so a resting thumb cannot push the ship around. */
 export const STICK_DEAD_ZONE = 0.14
 
+/** Buttons that latch on tap instead of only while held, so a thumb can steer with thrust engaged. */
+export const LATCH_ACTIONS: readonly Action[] = ['jump', 'descend', 'sprint', 'brake']
+
+/** Each group is one axis; engaging a member releases the other so the ship never fights itself. */
+const LATCH_GROUPS: Partial<Record<Action, readonly Action[]>> = {
+  jump: ['jump', 'descend'],
+  descend: ['jump', 'descend'],
+  sprint: ['sprint', 'brake'],
+  brake: ['sprint', 'brake'],
+}
+
+export function isLatching(action: Action): boolean {
+  return LATCH_ACTIONS.includes(action)
+}
+
+/** One latch that changed state: the button and whether it is now engaged. */
+export type LatchChange = [action: Action, on: boolean]
+
+/** Latch state behind the touch thrust buttons, kept free of the DOM so it tests on its own. */
+export class TouchLatches {
+  private readonly engaged = new Set<Action>()
+
+  get(action: Action): boolean {
+    return this.engaged.has(action)
+  }
+
+  /** Flip `action` and report every latch that changed, so the caller can sync input and the buttons. */
+  toggle(action: Action): LatchChange[] {
+    const on = !this.engaged.delete(action)
+    const changes: LatchChange[] = [[action, on]]
+    if (on) {
+      for (const other of LATCH_GROUPS[action] ?? []) {
+        if (this.engaged.delete(other)) changes.push([other, false])
+      }
+      this.engaged.add(action)
+    }
+    return changes
+  }
+
+  /** Release everything and report which buttons were lit. */
+  clear(): Action[] {
+    const was = [...this.engaged]
+    this.engaged.clear()
+    return was
+  }
+}
+
 /**
  * Turn a raw stick offset into move intent. `x` is strafe, `y` is forward, and 1 is the ring edge.
  * The dead zone absorbs thumb jitter, and a pull that is mostly on one axis zeroes the other, so
@@ -17,13 +64,15 @@ export function shapeStick(x: number, y: number): { x: number; y: number } {
 
 /**
  * On-screen touch controls: a floating stick on the left half, drag-to-look on the right half,
- * and JUMP / DASH buttons. Enabled automatically on the first touch.
+ * and latching RISE / FALL / BOOST / BRAKE buttons. Enabled automatically on the first touch.
  */
 export class TouchControls {
   private stickId: number | null = null
   private lookId: number | null = null
   private origin = { x: 0, y: 0 }
   private last = { x: 0, y: 0 }
+  private readonly latches = new TouchLatches()
+  private readonly latched = new Map<Action, HTMLElement>()
   private readonly stick: HTMLElement
   private readonly knob: HTMLElement
 
@@ -89,6 +138,16 @@ export class TouchControls {
 
     for (const btn of layer.querySelectorAll<HTMLElement>('[data-touch]')) {
       const action = btn.dataset.touch as Action
+      if (isLatching(action)) {
+        this.latched.set(action, btn)
+        btn.setAttribute('aria-pressed', 'false')
+        btn.addEventListener('pointerdown', e => {
+          e.preventDefault()
+          this.toggleLatch(action)
+        })
+        continue
+      }
+      // Non-latching buttons stay held for as long as the thumb is down.
       btn.addEventListener('pointerdown', e => {
         e.preventDefault()
         btn.setPointerCapture(e.pointerId)
@@ -102,6 +161,23 @@ export class TouchControls {
       btn.addEventListener('pointerup', up)
       btn.addEventListener('pointercancel', up)
     }
+  }
+
+  /** Tap-to-toggle a thrust button; the next tap releases it, and its opposite releases it too. */
+  private toggleLatch(action: Action): void {
+    for (const [changed, on] of this.latches.toggle(action)) this.setLatch(changed, on)
+  }
+
+  private setLatch(action: Action, on: boolean): void {
+    const button = this.latched.get(action)
+    button?.classList.toggle('is-on', on)
+    button?.setAttribute('aria-pressed', String(on))
+    this.input.setTouchButton(action, on)
+  }
+
+  /** Release every latched thrust button, e.g. when the flight pauses or a new mission starts. */
+  releaseAll(): void {
+    for (const action of this.latches.clear()) this.setLatch(action, false)
   }
 
   /** Drop the inline drag position so the stylesheet's resting place applies again. */
