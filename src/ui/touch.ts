@@ -16,10 +16,11 @@ export class TouchControls {
     const layer = root.querySelector<HTMLElement>('.touch-controls')!
     this.stick = layer.querySelector('.touch-stick')!
     this.knob = this.stick.querySelector('i')!
-    const radius = 56
+    // Re-measured on every drag so the smaller landscape stick keeps the same throw.
+    let radius = 56
 
     const enable = () => document.body.classList.add('has-touch')
-    if (matchMedia('(pointer: coarse)').matches) enable()
+    if (matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0) enable()
     window.addEventListener('touchstart', enable, { once: true, passive: true })
     // Any touch switches hints/prompts to touch, even taps on menu buttons.
     window.addEventListener('pointerdown', e => {
@@ -30,10 +31,11 @@ export class TouchControls {
     canvas.addEventListener('pointerdown', e => {
       if (e.pointerType !== 'touch' || !this.active()) return
       if (e.clientX < window.innerWidth * 0.45 && this.stickId === null) {
+        radius = Math.max(32, this.stick.getBoundingClientRect().width / 2 || 56)
         this.stickId = e.pointerId
         this.origin = { x: e.clientX, y: e.clientY }
-        this.stick.style.left = `${e.clientX}px`
-        this.stick.style.top = `${e.clientY}px`
+        this.stick.style.left = `${e.clientX - radius}px`
+        this.stick.style.top = `${e.clientY - radius}px`
         this.stick.classList.add('is-active')
       } else if (this.lookId === null) {
         this.lookId = e.pointerId
@@ -61,6 +63,7 @@ export class TouchControls {
         this.stickId = null
         this.knob.style.transform = ''
         this.stick.classList.remove('is-active')
+        this.park() // Return the ring to its resting corner instead of leaving it where the thumb lifted.
         this.input.setTouchMove(0, 0)
       }
       if (e.pointerId === this.lookId) this.lookId = null
@@ -83,5 +86,11 @@ export class TouchControls {
       btn.addEventListener('pointerup', up)
       btn.addEventListener('pointercancel', up)
     }
+  }
+
+  /** Drop the inline drag position so the stylesheet's resting place applies again. */
+  private park(): void {
+    this.stick.style.left = ''
+    this.stick.style.top = ''
   }
 }

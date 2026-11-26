@@ -170,7 +170,7 @@ body.has-touch .help-touch { display: block; }
 .flight-edge { position: absolute; top: 0; bottom: 0; width: 2px; opacity: .25; background: linear-gradient(transparent, rgba(123,226,225,.58) 30%, transparent 70%); }
 .flight-edge-left { left: 8px; }.flight-edge-right { right: 8px; }
 .touch-controls { display: none; }
-.touch-stick { position: absolute; left: 22%; top: 73%; width: 116px; height: 116px; margin: -58px 0 0 -58px; border-radius: 50%; border: 1px solid rgba(213,241,246,.42); background: rgba(11,28,42,.2); opacity: .42; pointer-events: none; }
+.touch-stick { position: absolute; width: 116px; height: 116px; border-radius: 50%; border: 1px solid rgba(213,241,246,.42); background: rgba(11,28,42,.2); opacity: .42; pointer-events: none; }
 .touch-stick.is-active { opacity: .88; background: rgba(13,40,53,.55); }
 .touch-stick i { position: absolute; left: 50%; top: 50%; width: 50px; height: 50px; margin: -25px 0 0 -25px; border: 1px solid rgba(198,241,240,.8); border-radius: 50%; background: rgba(123,226,225,.25); }
 .touch-buttons { position: absolute; right: 16px; bottom: calc(25px + env(safe-area-inset-bottom, 0px)); width: 146px; height: 176px; pointer-events: none; }
@@ -181,6 +181,19 @@ body.has-touch .help-touch { display: block; }
 .touch-brake { right: 68px; bottom: 12px; width: 54px; height: 54px; }
 .touch-btn.is-down { transform: scale(.93); background: rgba(65,150,157,.5); }
 .touch-hint { display: none; }
+/* Touch HUD: one layout for portrait phones, landscape phones and tablets. */
+body.has-touch .touch-stick { left: calc(28px + env(safe-area-inset-left, 0px)); top: auto; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); margin: 0; opacity: .58; }
+body.has-touch .pause-button small { display: none; }
+body.has-touch .touch-hint { position: absolute; left: calc(12px + env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); display: block; max-width: min(46vw, 220px); padding: 6px 8px; border: 1px solid rgba(157,189,201,.2); background: rgba(5,12,20,.58); color: #c4d2d8; text-align: left; font-size: 7px; line-height: 1.5; letter-spacing: .1em; }
+body.has-touch .touch-stick.is-active ~ .touch-hint { display: none; }
+body.has-touch .control-hint, body.has-touch .eva-controls { display: none; }
+body.has-touch .context-action { left: auto; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(214px + env(safe-area-inset-bottom, 0px)); transform: none; width: 146px; min-width: 0; min-height: 44px; padding: 8px 7px; gap: 6px; font-size: 8px; letter-spacing: .08em; text-align: center; }
+body.has-touch .context-action > span { flex: 1; }
+body.has-touch .context-action b { display: none; }
+/* Keep the controls on touch-primary devices at any width, so landscape phones and tablets get them too. */
+@media (pointer: coarse), (max-width: 1024px) {
+  body.has-touch .touch-controls { display: block; }
+}
 /* Pause and mission debrief */
 .pause-overlay, .debrief-overlay { position: absolute; z-index: 4; inset: 0; display: grid; place-items: center; padding: 18px; background: rgba(3,8,14,.68); backdrop-filter: blur(7px); opacity: 0; visibility: hidden; transition: opacity .2s, visibility .2s; pointer-events: none; }
 .pause-overlay.is-active, .debrief-overlay.is-active { opacity: 1; visibility: visible; pointer-events: auto; }
@@ -240,14 +253,6 @@ body.has-touch .help-touch { display: block; }
   .control-hint, .eva-controls { bottom: calc(12px + env(safe-area-inset-bottom, 0px)); max-width: calc(100vw - 20px); flex-wrap: wrap; gap: 5px 8px; padding: 7px 9px; font-size: 6px; white-space: normal; }
   .flight-stage { font-size: 6px; }
   .flight-toast { top: 22%; width: max-content; max-width: 88vw; font-size: 9px; }
-  body.has-touch .touch-controls { display: block; }
-  body.has-touch .touch-hint { position: absolute; left: 12px; bottom: calc(13px + env(safe-area-inset-bottom, 0px)); display: block; max-width: min(42vw, calc(100vw - 190px)); padding: 6px 8px; border: 1px solid rgba(157,189,201,.2); background: rgba(5,12,20,.58); color: #c4d2d8; text-align: left; font-size: 6px; letter-spacing: .1em; }
-  body.has-touch .touch-stick.is-active ~ .touch-hint { display: none; }
-  body.has-touch .control-hint, body.has-touch .eva-controls { display: none; }
-  body.has-touch .context-action { left: calc(45vw + 66px); right: 8px; bottom: calc(max(190px, 35vh) + env(safe-area-inset-bottom, 0px)); transform: none; width: calc(55vw - 74px); min-width: 0; min-height: 44px; padding: 8px 6px; gap: 6px; font-size: 7px; letter-spacing: .08em; text-align: center; white-space: normal; }
-  body.has-touch .context-action > span { flex: 1; }
-  body.has-touch .context-action b { display: none; }
-  body.has-touch .touch-stick { top: 73%; }
 }
 @media (max-height: 600px) and (min-width: 741px) {
   .control-layout { min-height: calc(100dvh - 110px); padding-top: 20px; padding-bottom: 20px; gap: 42px; }
@@ -255,5 +260,17 @@ body.has-touch .help-touch { display: block; }
   .control-intro { margin: 17px 0 20px; }
   .mission-card { padding-top: 14px; padding-bottom: 14px; }
   .mission-brief { margin: 8px 0; }
+}
+/* Short landscape viewports: shrink the touch controls and keep telemetry clear of the stick. */
+@media (max-height: 520px) {
+  body.has-touch .touch-stick { left: calc(20px + env(safe-area-inset-left, 0px)); bottom: calc(70px + env(safe-area-inset-bottom, 0px)); width: 96px; height: 96px; }
+  body.has-touch .touch-stick i { width: 42px; height: 42px; margin: -21px 0 0 -21px; }
+  body.has-touch .touch-rise, body.has-touch .touch-boost { width: 54px; height: 54px; }
+  body.has-touch .touch-fall, body.has-touch .touch-brake { width: 48px; height: 48px; }
+  .touch-buttons { bottom: calc(18px + env(safe-area-inset-bottom, 0px)); }
+  .flight-left { top: 74px; width: 168px; padding: 8px 10px; }
+  .flight-destination { margin-top: 4px; font-size: 11px; }
+  .flight-data, .eva-data { margin-top: 8px; }
+  .data-row { margin-top: 6px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; scroll-behavior: auto !important; } }
