@@ -27,6 +27,7 @@ async function boot(): Promise<void> {
   const assets = new Assets()
   let game: Game | undefined
   let loop: GameLoop | undefined
+  let touch: TouchControls | undefined
   let progress: Campaign = parseCampaign(safeGet(CAMPAIGN_STORAGE_KEY))
   let lockLostAt = 0
 
@@ -60,6 +61,7 @@ async function boot(): Promise<void> {
       ui.toast('mission.status.locked')
       return
     }
+    touch?.releaseAll()
     game.start(id)
     ui.hidePause()
     ui.hideDebrief()
@@ -73,6 +75,7 @@ async function boot(): Promise<void> {
   function pause(): void {
     if (game?.mode !== 'playing') return
     game.pause()
+    touch?.releaseAll()
     ui.showPause()
     input.unlockPointer()
   }
@@ -88,6 +91,7 @@ async function boot(): Promise<void> {
   function returnToControl(): void {
     if (!game) return
     game.toTitle()
+    touch?.releaseAll()
     ui.hidePause()
     ui.hideDebrief()
     ui.showTitle(progress)
@@ -157,7 +161,7 @@ async function boot(): Promise<void> {
       document.addEventListener('visibilitychange', () => { if (document.hidden) pause() })
       window.addEventListener('game:pause', pause)
       canvas.addEventListener('click', () => { if (g.mode === 'playing') input.lockPointer() })
-      new TouchControls(uiRoot, input, () => g.mode === 'playing')
+      touch = new TouchControls(uiRoot, input, () => g.mode === 'playing')
       ;(window as unknown as { __game: unknown }).__game = { game: g, ui, input, save, assets, get campaign() { return progress } }
     } catch (error) {
       console.error('Orbital asset loading failed', error)
