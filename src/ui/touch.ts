@@ -1,5 +1,20 @@
 import type { Action, Input } from '../engine/input'
 
+/** Inside this radius the stick reports no thrust, so a resting thumb cannot push the ship around. */
+export const STICK_DEAD_ZONE = 0.14
+
+/**
+ * Turn a raw stick offset into move intent. `x` is strafe, `y` is forward, and 1 is the ring edge.
+ * The dead zone absorbs thumb jitter, and a pull that is mostly on one axis zeroes the other, so
+ * pulling straight back is pure retro-thrust instead of reverse plus an accidental strafe.
+ */
+export function shapeStick(x: number, y: number): { x: number; y: number } {
+  if (Math.hypot(x, y) < STICK_DEAD_ZONE) return { x: 0, y: 0 }
+  if (Math.abs(y) > 0.5 && Math.abs(y) > Math.abs(x) * 2) return { x: 0, y }
+  if (Math.abs(x) > 0.5 && Math.abs(x) > Math.abs(y) * 2) return { x, y: 0 }
+  return { x, y }
+}
+
 /**
  * On-screen touch controls: a floating stick on the left half, drag-to-look on the right half,
  * and JUMP / DASH buttons. Enabled automatically on the first touch.
@@ -52,7 +67,8 @@ export class TouchControls {
           dy = (dy / len) * radius
         }
         this.knob.style.transform = `translate(${dx}px, ${dy}px)`
-        this.input.setTouchMove(dx / radius, -dy / radius)
+        const shaped = shapeStick(dx / radius, -dy / radius)
+        this.input.setTouchMove(shaped.x, shaped.y)
       } else if (e.pointerId === this.lookId) {
         this.input.addTouchLook(e.clientX - this.last.x, e.clientY - this.last.y)
         this.last = { x: e.clientX, y: e.clientY }
